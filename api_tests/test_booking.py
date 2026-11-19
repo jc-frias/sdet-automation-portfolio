@@ -5,8 +5,10 @@ import requests
 
 
 BOOKINGS_URL = "https://restful-booker.herokuapp.com/booking"
+LOGIN_URL = "https://restful-booker.herokuapp.com/auth"
 SUCCESS_CODE = 200
 BOOKING_DATA = {'firstname': 'Carlos', 'lastname': 'Frias', 'totalprice': 128, 'depositpaid': True, 'bookingdates': {'checkin': '2026-11-18', 'checkout': '2026-11-30'}}
+
 
 
 def test_if_booking_exists():
@@ -58,3 +60,17 @@ def test_create_and_get_booking():
     print(data_response)
     assert data_response['firstname'] == BOOKING_DATA['firstname'], f"First name does not match, got: {data_response['firstname']}, Expected: {BOOKING_DATA['firstname']}"
     assert data_response['lastname'] == BOOKING_DATA['lastname'], f"Last name does not match, got: {data_response['lastname']}, Expected: {BOOKING_DATA['lastname']}"
+
+
+
+def test_get_token():
+    credentials = {"username": "admin", "password": "password123"}
+    headers = {"Content-Type": "application/json", "Accept": "application/json"}
+
+    server_response = requests.post(LOGIN_URL, json=credentials, headers=headers)
+    post_status_code = server_response.status_code
+    assert post_status_code == SUCCESS_CODE, f"POST Status code does not match, got: {post_status_code}, Expected: {SUCCESS_CODE}"
+    print(post_status_code)
+    token_info = server_response.json()
+    print(token_info)
+    assert "token" in token_info, f"Token was not generated, got: {token_info}"
