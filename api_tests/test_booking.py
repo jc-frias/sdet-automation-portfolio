@@ -5,7 +5,9 @@ import requests
 BOOKINGS_URL = "https://restful-booker.herokuapp.com/booking"
 LOGIN_URL = "https://restful-booker.herokuapp.com/auth"
 SUCCESS_CODE = 200
+DELETE_SUCCESS_CODE = 201 # Expected should be 200 or 204
 PROHIBITED_ACCESS_CODE = 403
+ELEMENT_DOES_NOT_EXIST_CODE = 404
 BOOKING_DATA = {'firstname': 'Carlos', 'lastname': 'Frias', 'totalprice': 128, 'depositpaid': True,
                 'bookingdates': {'checkin': '2026-11-18', 'checkout': '2026-11-30'}}
 CREDENTIALS = {"username": "admin", "password": "password123"}
@@ -136,3 +138,31 @@ def test_update_booking_without_token():
     data_response = get_server_response.json()
     firstname = data_response["firstname"]
     assert firstname == BOOKING_DATA["firstname"], f"First name does not match, got: {firstname}, Expected: {BOOKING_DATA["firstname"]}"
+
+
+def test_delete_booking():
+    headers = {"Content-Type": "application/json", "Accept": "application/json"}
+    server_response = requests.post(LOGIN_URL, json=CREDENTIALS, headers=headers)
+    token_info = server_response.json()
+
+    server_response = requests.post(BOOKINGS_URL, json=BOOKING_DATA, headers=headers)
+    post_status_code = server_response.status_code
+    assert post_status_code == SUCCESS_CODE, f"Unexpected POST response from server, got: {post_status_code}, Expected: {SUCCESS_CODE}"
+    post_info = server_response.json()
+    booking_id = post_info["bookingid"]
+
+    headers_token = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Cookie": f"token={token_info["token"]}",
+    }
+
+    url = f"{BOOKINGS_URL}/{booking_id}"
+
+    delete_server_response = requests.delete(url, headers=headers_token)
+    delete_status_code = delete_server_response.status_code
+    assert delete_status_code == DELETE_SUCCESS_CODE, f"Unexpected DELETE response from server, got: {delete_status_code}, Expected: {DELETE_SUCCESS_CODE}"
+
+    get_server_response = requests.get(url, headers=headers)
+    get_status_code = get_server_response.status_code
+    assert get_status_code == ELEMENT_DOES_NOT_EXIST_CODE, f"Unexpected GET response from server, got: {get_status_code}, Expected: {ELEMENT_DOES_NOT_EXIST_CODE}"
