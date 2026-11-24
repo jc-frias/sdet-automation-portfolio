@@ -51,7 +51,7 @@ def booking_id(auth_headers):
 
 
 
-
+@pytest.mark.skip(reason="Depends on shared data (booking 1); flaky in CI. Covered by test_create_and_get_booking")
 def test_if_booking_exists():
     booking_id = 1
     url = f"{BOOKINGS_URL}/{booking_id}"
