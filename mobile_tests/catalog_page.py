@@ -1,4 +1,4 @@
-
+# catalog_page.py
 from appium.webdriver.common.appiumby import AppiumBy
 from base_page import BasePage
 from appium.webdriver.webdriver import WebDriver
@@ -9,12 +9,13 @@ ELEMENT_TEXT = "com.saucelabs.mydemoapp.android:id/titleTV"
 PRODUCTS_NAME = (AppiumBy.ID, ELEMENT_TEXT)
 CART_RESOURCE_ID = "com.saucelabs.mydemoapp.android:id/cartIV"
 CART_ELEMENT = (AppiumBy.ID, CART_RESOURCE_ID)
+SCROLL_RESOURCE_ID = "com.saucelabs.mydemoapp.android:id/scrollView"
+SCROLL_LOCATOR = (AppiumBy.ID, SCROLL_RESOURCE_ID)
 
 
 class CatalogPage(BasePage):
     def __init__(self, driver: WebDriver):
         super().__init__(driver)
-
 
     def open_product(self, index):
         products = self.get_elements(PRODUCTS)
@@ -28,3 +29,7 @@ class CatalogPage(BasePage):
 
     def open_cart(self):
         self.click_element(CART_ELEMENT)
+
+    def scroll_catalog(self, max_scrolls=20):
+        bottom_reached = self.scroll(SCROLL_LOCATOR, max_scrolls)
+        return bottom_reached
