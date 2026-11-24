@@ -1,10 +1,11 @@
 # test_catalog.py
 
 import pytest
+from appium.webdriver.common.appiumby import AppiumBy
 from catalog_page import CatalogPage
 from product_details_page import ProductDetailsPage
 
-
+MAX_SCROLLS = 12
 
 @pytest.mark.parametrize("index",[0,
                                   pytest.param(1, marks=pytest.mark.xfail(
@@ -21,4 +22,13 @@ def test_catalog(driver, index):
 
     assert product_name == details_name, f"Product name does not match, got: {details_name}; Expected: {product_name}"
 
+
+def test_scroll(driver):
+    scroll_element = "com.saucelabs.mydemoapp.android:id/scrollView"
+    scroll_locator = (AppiumBy.ID, scroll_element)
+
+    catalog_page = CatalogPage(driver)
+    reached_bottom = catalog_page.scroll(scroll_locator, MAX_SCROLLS)
+
+    assert reached_bottom, f"Bottom was not reached, limit set: {MAX_SCROLLS}"
 

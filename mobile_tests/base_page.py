@@ -5,11 +5,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
-
 class BasePage:
     def __init__(self, driver: WebDriver):
         self.driver = driver
         self.wait = WebDriverWait(self.driver, 10)
+
 
     def click_element(self, locator: tuple):
         try:
@@ -18,16 +18,41 @@ class BasePage:
         except TimeoutException:
             raise Exception(f" Framework Error: 10 seconds passed and it could not be clicked. {locator}") from None
 
+
     def get_text(self, locator: tuple) -> str:
         element = self.wait.until(EC.visibility_of_element_located(locator))
         return element.text
 
+
     def element_exists(self, locator: tuple) -> bool:
         return len(self.driver.find_elements(*locator)) > 0
+
 
     def go_back(self):
         self.driver.back()
 
+
     def get_elements(self, locator: tuple):
         elements = self.wait.until(EC.presence_of_all_elements_located(locator))
         return elements
+
+
+    def get_element(self, locator: tuple):
+        element = self.wait.until(EC.presence_of_element_located(locator))
+        return element
+
+
+    def scroll(self, locator, max_scrolls):
+        container = self.get_element(locator)
+        can_scroll_more = True
+        scroll_count = 0
+
+        while can_scroll_more and scroll_count < max_scrolls:
+            can_scroll_more = self.driver.execute_script("mobile: scrollGesture", {
+                "elementId": container.id,
+                "direction": "down",
+                "percent": 0.75,
+            })
+            scroll_count += 1
+
+        return not can_scroll_more
