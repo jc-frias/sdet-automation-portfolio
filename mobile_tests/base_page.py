@@ -54,5 +54,18 @@ class BasePage:
                 "percent": 0.75,
             })
             scroll_count += 1
-
         return not can_scroll_more
+
+
+    def scroll_to_element(self, container_locator, target_locator):
+        scroll_count = 0
+        container = self.get_element(container_locator)
+        while not self.element_exists(target_locator) and scroll_count < 20:
+            self.driver.execute_script("mobile: scrollGesture", {
+                "elementId": container.id,
+                "direction": "down",
+                "percent": 0.75,
+            })
+            scroll_count += 1
+        return self.element_exists(target_locator)
+

@@ -33,3 +33,13 @@ class CatalogPage(BasePage):
     def scroll_catalog(self, max_scrolls=20):
         bottom_reached = self.scroll(SCROLL_LOCATOR, max_scrolls)
         return bottom_reached
+
+    def scroll_to_product(self, name):
+        product_locator = (AppiumBy.ANDROID_UIAUTOMATOR, f'new UiSelector().text("{name}")')
+        found = self.scroll_to_element(SCROLL_LOCATOR, product_locator)
+        return found
+
+    def open_product_by_name(self, name):
+        locator = (AppiumBy.XPATH, f'//android.widget.TextView[@text="{name}"]/../android.widget.ImageView[@content-desc="Product Image"]')
+        self.scroll_to_element(SCROLL_LOCATOR, locator)
+        self.click_element(locator)
